@@ -17,7 +17,7 @@ def load_data():
         # dataframe with the specified columns
         return pd.DataFrame(
             columns=[
-                'date', 'time', 'category', 'description', 'amount', 'type'
+                'date', 'time', 'category', 'type', 'amount', 'transaction_type', 'description'
             ]
         )
 
@@ -64,47 +64,65 @@ def manager_space():
         category = st.selectbox(
             'Categorie',
             [
-                'airtel money',
-                # 'moov money',
-                'abonnement canal +',
-                # 'transfert credit (aiftel, moov)'
+                'Selectionner Une Catégorie',
+                'Airtel Money',
+                'Moov Money',
+                'Canal +',
+                'Recette Journalière'
             ]
         )
     with col2:
         # The transaction amount
         amount = st.number_input('Montant', min_value=0.0, step=1.00)
     with col3:
-        # Thr transaction type, income or outgo (expense)
-        type_ = st.selectbox('Type', ['income', 'expense'])
+        if category == 'Airtel Money' or category == 'Moov Money':
+            type_ = st.selectbox('Type', ['Dépôt', 'Retrait'])
+            if type_ == 'Dépôt':
+                transaction_type = '⬇️'
+            else:
+                transaction_type = '⬆️'
+        elif category == 'Canal +':
+            type_ = st.selectbox('Type', ['Abonnement', 'Achat de Kits'])
+            transaction_type = '⬇️'
+        elif category == 'Recette Journalière':
+            type_ = st.selectbox('Type', ['Secretariat', 'Transfert Airtel', 'Transfert Moov'])
+            transaction_type = '⬇️'
+        else:
+            # The transaction type, income or outgo (expense)
+            # type_ = st.selectbox('Type', ['income', 'expense'])
+            type_ = st.selectbox('Type', [''])
     
     # Description of the transaction
     description = st.text_input('Description')
     
-    # Transaction add button, if the button is pressed
-    if st.button('Ajouter Transaction'):
-        # Automatically set transaction date and time to the current datetime
-        date = datetime.now().date()
-        time = datetime.now().time().strftime('%H:%M:%S')
+    if category == 'Selectionner Une Catégorie' or amount == 0.0 or type_ == '':
+        st.button('Ajouter Transaction', disabled=st.session_state.get("disabled", True))
+    else:
+        # Transaction add button, if the button is pressed
+        if st.button('Ajouter Transaction'):
+            # Automatically set transaction date and time to the current datetime
+            date = datetime.now().date()
+            time = datetime.now().time().strftime('%H:%M')
 
-        # Create a new transaction dataframe with the provided infomations
-        new_transaction = pd.DataFrame(
-            [
-                [date, time, category, description, amount, type_]
-            ],
-            columns=[
-                'date', 'time', 'category', 'description', 'amount', 'type'
-            ]
-        )
-        # Load transaction data
-        data = load_data()
+            # Create a new transaction dataframe with the provided infomations
+            new_transaction = pd.DataFrame(
+                [
+                    [date, time, category, type_, amount, transaction_type, description]
+                ],
+                columns=[
+                    'date', 'time', 'category', 'type', 'amount', 'transaction_type', 'description'
+                ]
+            )
+            # Load transaction data
+            data = load_data()
 
-        # Append the new transaction to the existing data
-        data = pd.concat([data, new_transaction], ignore_index=True)
+            # Append the new transaction to the existing data
+            data = pd.concat([data, new_transaction], ignore_index=True)
 
-        # Save
-        save_data(data)
+            # Save
+            save_data(data)
 
-        st.success('Transaction ajouter avec success!')
+            st.success('Transaction ajouter avec success!')
 
     # Transaction history section
     st.subheader('Historique des Transactions')
@@ -127,8 +145,8 @@ def admin_space():
         return
 
     # Compute income, expense and profit
-    total_income = data[data['type'] == 'income']['amount'].sum()
-    total_expense = data[data['type'] == 'expense']['amount'].sum()
+    total_income = data[data['transaction_type'] == '⬇️']['amount'].sum()
+    total_expense = data[data['transaction_type'] == '⬆️']['amount'].sum()
     profit = total_income - total_expense
 
     # Display the computed values
