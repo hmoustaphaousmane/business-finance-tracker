@@ -6,6 +6,7 @@ from datetime import datetime
 
 DATA_FILE = 'db/transactions.csv'
 
+
 # Load transactions from CSV file
 def load_data():
     """Load transactions data from CSV file"""
@@ -17,46 +18,27 @@ def load_data():
         # dataframe with the specified columns
         return pd.DataFrame(
             columns=[
-                'date', 'time', 'category', 'type', 'amount', 'transaction_type', 'description'
+                'date',
+                'time',
+                'category',
+                'type',
+                'amount',
+                'transaction_type',
+                'description'
             ]
         )
+
 
 def save_data(df):
     """Save transactions data to CSV file"""
     df.to_csv(DATA_FILE, index=False)
 
-def main():
-    """Entry point of the program"""
-    # Title of the app
-    st.title('Gestion des transactions')
-
-    # Sidebar for navigation
-    role = st.sidebar.selectbox('Select your role', ['Gérant', 'Admin'])
-
-    # If the user is a manager,
-    if role == 'Gérant':
-        # Dipslay the manager space
-        manager_space()
-    # Otherwise, is the user is an Admin
-    elif role == 'Admin':
-        # Require password
-        password = st.sidebar.text_input(
-            'Enter admin password',
-            type='password',
-            # place_holder='Enter an admin password here'
-        )
-        # Verify the password
-        if password == 'adminpassword':  # Replace with a secure method
-            # If the password is correct, display the admin space
-            admin_space()
-        else:
-            st.error('Mot de passe incorrect!')
 
 def manager_space():
     """Define the Manager space"""
     st.header('Espace Gérant')
     st.subheader('Ajouter des Nouvelles Transactions')
-    
+
     # New Transaction registration form
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -85,32 +67,55 @@ def manager_space():
             type_ = st.selectbox('Type', ['Abonnement', 'Achat de Kits'])
             transaction_type = '⬇️'
         elif category == 'Recette Journalière':
-            type_ = st.selectbox('Type', ['Secretariat', 'Transfert Airtel', 'Transfert Moov'])
+            type_ = st.selectbox(
+                'Type',
+                ['Secretariat', 'Transfert Airtel', 'Transfert Moov']
+            )
             transaction_type = '⬇️'
         else:
             # The transaction type, income or outgo (expense)
             # type_ = st.selectbox('Type', ['income', 'expense'])
             type_ = st.selectbox('Type', [''])
-    
+
     # Description of the transaction
     description = st.text_input('Description')
-    
-    if category == 'Selectionner Une Catégorie' or amount == 0.0 or type_ == '':
-        st.button('Ajouter Transaction', disabled=st.session_state.get("disabled", True))
+
+    if (
+        category == 'Selectionner Une Catégorie' or
+        amount == 0.0 or type_ == ''
+    ):
+        st.button(
+            'Ajouter Transaction',
+            disabled=st.session_state.get("disabled", True)
+        )
     else:
         # Transaction add button, if the button is pressed
         if st.button('Ajouter Transaction'):
-            # Automatically set transaction date and time to the current datetime
+            # Set transaction date and time to the current datetime
             date = datetime.now().date()
             time = datetime.now().time().strftime('%H:%M')
 
             # Create a new transaction dataframe with the provided infomations
             new_transaction = pd.DataFrame(
                 [
-                    [date, time, category, type_, amount, transaction_type, description]
+                    [
+                        date,
+                        time,
+                        category,
+                        type_,
+                        amount,
+                        transaction_type,
+                        description
+                    ]
                 ],
                 columns=[
-                    'date', 'time', 'category', 'type', 'amount', 'transaction_type', 'description'
+                    'date',
+                    'time',
+                    'category',
+                    'type',
+                    'amount',
+                    'transaction_type',
+                    'description'
                 ]
             )
             # Load transaction data
@@ -129,10 +134,11 @@ def manager_space():
     data = load_data()
     st.dataframe(data)
 
+
 def admin_space():
     """Define an Admin's space"""
     st.header('Admin Space')
-    
+
     # Statistics section
     st.subheader('Statistics')
     # Load the data
@@ -157,6 +163,35 @@ def admin_space():
     # Transaction history section
     st.subheader('Historique des Transactions')
     st.dataframe(data)
+
+
+def main():
+    """Entry point of the program"""
+    # Title of the app
+    st.title('Gestion des transactions')
+
+    # Sidebar for navigation
+    role = st.sidebar.selectbox('Select your role', ['Gérant', 'Admin'])
+
+    # If the user is a manager,
+    if role == 'Gérant':
+        # Dipslay the manager space
+        manager_space()
+    # Otherwise, is the user is an Admin
+    elif role == 'Admin':
+        # Require password
+        password = st.sidebar.text_input(
+            'Enter admin password',
+            type='password',
+            # place_holder='Enter an admin password here'
+        )
+        # Verify the password
+        if password == 'adminpassword':  # Replace with a secure method
+            # If the password is correct, display the admin space
+            admin_space()
+        else:
+            st.error('Mot de passe incorrect!')
+
 
 if __name__ == '__main__':
     main()
