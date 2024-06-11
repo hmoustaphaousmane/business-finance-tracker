@@ -156,9 +156,10 @@ def admin_space():
     profit = total_income - total_expense
 
     # Display the computed values
-    st.metric('RevenuTotal', f"${total_income:.2f}")
-    st.metric('Dépense Totale', f"${total_expense:.2f}")
-    st.metric('Profit', f"${profit:.2f}")
+    col1, col2, col3 = st.columns(3)
+    col1.metric('RevenuTotal', f"{total_income:.2f} FCFA")
+    col2.metric('Dépense Totale', f"{total_expense:.2f} FCFA")
+    col3.metric('Profit', f"{profit:.2f} FCFA", f"{profit} FCFA")
 
     # Transaction history section
     st.subheader('Historique des Transactions')
