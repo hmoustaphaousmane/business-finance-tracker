@@ -80,16 +80,18 @@ def manager_space():
     # Description of the transaction
     description = st.text_input('Description')
 
+    # If a category/type is not yet select or the amount is 0
     if (
         category == 'Selectionner Une Catégorie' or
         amount == 0.0 or type_ == ''
     ):
+        # Disable the add transaction button
         st.button(
             'Ajouter Transaction',
             disabled=st.session_state.get("disabled", True)
         )
     else:
-        # Transaction add button, if the button is pressed
+        # If the add transaction add button is pressed
         if st.button('Ajouter Transaction'):
             # Set transaction date and time to the current datetime
             date = datetime.now().date()
@@ -118,7 +120,7 @@ def manager_space():
                     'description'
                 ]
             )
-            # Load transaction data
+            # Load existing transaction data
             data = load_data()
 
             # Append the new transaction to the existing data
@@ -146,7 +148,7 @@ def admin_space():
 
     # If there is no data yet
     if data.empty:
-        # Display a wornig message
+        # Display a warnig message
         st.warning('No transactions to show.')
         return
 
@@ -178,7 +180,7 @@ def main():
     if role == 'Gérant':
         # Dipslay the manager space
         manager_space()
-    # Otherwise, is the user is an Admin
+    # Otherwise, if the user is an Admin
     elif role == 'Admin':
         # Require password
         password = st.sidebar.text_input(
@@ -187,12 +189,13 @@ def main():
             # place_holder='Enter an admin password here'
         )
         # Verify the password
-        if password == 'adminpassword':  # Replace with a secure method
+        if password == 'adminpassword':  # TODO: Replace with a secure method
             # If the password is correct, display the admin space
             admin_space()
         else:
             st.error('Mot de passe incorrect!')
 
 
+# Make sure that the file is running as a script
 if __name__ == '__main__':
     main()
