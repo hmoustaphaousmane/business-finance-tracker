@@ -103,7 +103,7 @@ def manager_space():
                     [
                         date,
                         time,
-                        category,
+                        category,   
                         type_,
                         amount,
                         transaction_type,
@@ -140,7 +140,7 @@ def manager_space():
 def admin_space():
     """Define an Admin's space"""
     st.header('Admin Space')
-
+    
     # Statistics section
     st.subheader('Statistics')
     # Load the data
@@ -148,7 +148,7 @@ def admin_space():
 
     # If there is no data yet
     if data.empty:
-        # Display a warnig message
+        # Display a wornig message
         st.warning('No transactions to show.')
         return
 
@@ -180,7 +180,7 @@ def main():
     if role == 'Gérant':
         # Dipslay the manager space
         manager_space()
-    # Otherwise, if the user is an Admin
+    # Otherwise, is the user is an Admin
     elif role == 'Admin':
         # Require password
         password = st.sidebar.text_input(
@@ -189,11 +189,13 @@ def main():
             # place_holder='Enter an admin password here'
         )
         # Verify the password
-        if password == 'adminpassword':  # TODO: Replace with a secure method
+        if password == 'adminpassword':  # Replace with a secure method
             # If the password is correct, display the admin space
             admin_space()
+        elif password == '':
+            st.warning('Veillez entrer votre mot de passe.', icon="⚠️")
         else:
-            st.error('Mot de passe incorrect!')
+            st.error('Mot de passe incorrect!', icon='❌')
 
 
 # Make sure that the file is running as a script
